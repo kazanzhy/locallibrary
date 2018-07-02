@@ -80,7 +80,12 @@ class BookInstance(models.Model):
         String for representing the Model object
         """
         return '{0} ({1})'.format (self.id, self.book.title)
-
+    def display_book(self):
+        """
+        Creates a string for the Book. This is required to display book in Admin.
+        """
+        return str(self.book.title)
+    display_book.short_description = 'Book'
 
 class Author(models.Model):
     """

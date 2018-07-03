@@ -28,6 +28,7 @@ def index(request):
 
 class BookListView(generic.ListView):
     model = Book
+    paginate_by = 10
     '''
     #context_object_name = 'my_book_list'   # ваше собственное имя переменной контекста в шаблоне
     #queryset = Book.objects.filter(title__icontains='war')[:5] # Получение 5 книг, содержащих слово 'war' в заголовке
@@ -46,6 +47,13 @@ class BookDetailView(generic.DetailView):
     model = Book
 
 
+class AuthorListView(generic.ListView):
+    model = Author
+    paginate_by = 10
+
+
+class AuthorDetailView(generic.DetailView):
+    model = Author
 
 
 

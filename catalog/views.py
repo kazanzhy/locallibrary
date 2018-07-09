@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.views import generic
+from django.contrib.auth.decorators import login_required
 
 from .models import Book, Author, BookInstance, Genre
 

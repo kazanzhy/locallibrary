@@ -86,7 +86,11 @@ class LoanedBooksByLibrarianListView(LoginRequiredMixin,generic.ListView):
         return BookInstance.objects.filter(status__exact='o').order_by('due_back')
 
 
-
+def renew_book_librarian(request):
+    """
+    Функция отображения для домашней страницы сайта.
+    """
+    pass
 
 
 

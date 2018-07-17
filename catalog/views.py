@@ -1,9 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views import generic
-from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+import datetime
+
 from .models import Book, Author, BookInstance, Genre
+from .forms import RenewBookForm
 
 
 def index(request):
@@ -86,12 +91,31 @@ class LoanedBooksByLibrarianListView(LoginRequiredMixin,generic.ListView):
         return BookInstance.objects.filter(status__exact='o').order_by('due_back')
 
 
-def renew_book_librarian(request):
-    """
-    Функция отображения для домашней страницы сайта.
-    """
-    pass
+@permission_required('catalog.can_mark_returned')
+def renew_book_librarian(request, pk):
+    book_inst=get_object_or_404(BookInstance, pk = pk)
 
+    # Если данный запрос типа POST, тогда
+    if request.method == 'POST':
+        # Создаем экземпляр формы и заполняем данными из запроса (связывание, binding):
+        form = RenewBookForm(request.POST)
+
+        # Проверка валидности данных формы:
+        if form.is_valid():
+            # Обработка данных из form.cleaned_data 
+            #(здесь мы просто присваиваем их полю due_back)
+            book_inst.due_back = form.cleaned_data['renewal_date']
+            book_inst.save()
+
+            # Переход по адресу 'all-borrowed':
+            return HttpResponseRedirect(reverse('all-borrowed'))
+
+    # Если это GET (или какой-либо еще), создать форму по умолчанию.
+    else:
+        proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
+        form = RenewBookForm(initial={'renewal_date': proposed_renewal_date,})
+    context = {'form': form, 'bookinst':book_inst}
+    return render(request, 'catalog/book_renew_librarian.html', context)
 
 
 

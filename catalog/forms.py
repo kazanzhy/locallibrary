@@ -9,7 +9,10 @@ class RenewBookForm(forms.Form):
     renewal_date = forms.DateField(help_text="Enter a date between now and 4 weeks (default 3).")
 
     def clean_renewal_date(self):
-        data = self.cleaned_data['renewal_date']
+        class Meta:
+            model = BookInstance
+            fields = ['due_back',]
+            data = self.cleaned_data['renewal_date']
         
         #Проверка того, что дата не выходит за "нижнюю" границу (не в прошлом). 
         if data < datetime.date.today():
@@ -21,3 +24,4 @@ class RenewBookForm(forms.Form):
 
         # Помните, что всегда надо возвращать "очищенные" данные.
         return data
+
